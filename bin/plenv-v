@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $root = $ENV{PLENV_ROOT} || "$ENV{HOME}/.plenv";
+my @version = sort grep -d, glob "$root/versions/*";
+
+my $current = "";
+{
+    open my $fh, "<", "$root/version" or last;
+    $current = <$fh>;
+    chomp $current;
+}
+
+for my $version (@version) {
+    (my $short = $version) =~ s{^.*/versions/}{};
+    my ($day) = grep -f, glob "$version/*-*-*";
+    $day =~ s{^$version/}{} if $day;
+    print "\e[1;37m" if $short eq $current;
+    print "  $short";
+    print " ($day)" if $day;
+    print "\e[m" if $short eq $current;
+    print "\n";
+}
